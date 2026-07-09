@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blue Rocket AI Pro</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #070d1c; --bg2: #0b1526; --bg3: #0f1e38;
+  --border: #1a3560; --blue: #1565c0; --blue-l: #1976d2;
+  --cyan: #29b6f6; --text: #dde8f5; --text-dim: #7a9ab8;
+  --green: #4caf50; --orange: #ff9800;
+}
+html, body { height: 100%; font-family: 'Segoe UI', system-ui, sans-serif; }
+body { background: var(--bg); color: var(--text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+header {
+  background: linear-gradient(90deg, #070d1c, #0d2050);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 20px; display: flex; align-items: center; gap: 14px; flex-shrink: 0;
+}
+.logo { width: 38px; height: 38px; background: linear-gradient(135deg, var(--blue), var(--cyan)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 0 16px rgba(41,182,246,0.25); }
+.header-info h1 { font-size: 0.95rem; font-weight: 700; color: var(--cyan); }
+.header-info p { font-size: 0.68rem; color: var(--text-dim); }
+.badges { margin-left: auto; display: flex; gap: 6px; }
+.badge { display: flex; align-items: center; gap: 5px; border-radius: 20px; padding: 4px 10px; font-size: 0.65rem; font-weight: 600; }
+.badge-green { background: rgba(76,175,80,0.1); border: 1px solid rgba(76,175,80,0.25); color: var(--green); }
+.badge-orange { background: rgba(255,152,0,0.1); border: 1px solid rgba(255,152,0,0.25); color: var(--orange); }
+.dot { width: 6px; height: 6px; border-radius: 50%; animation: pulse 2.5s infinite; }
+.dot-green { background: var(--green); }
+.dot-orange { background: var(--orange); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+.quick-bar { padding: 10px 16px; border-bottom: 1px solid rgba(26,53,96,0.5); background: var(--bg2); flex-shrink: 0; }
+.quick-label { font-size: 0.62rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 7px; font-weight: 600; }
+.quick-btns { display: flex; flex-wrap: wrap; gap: 6px; }
+.qbtn { background: var(--bg3); border: 1px solid var(--border); color: #7ab8e8; border-radius: 20px; padding: 5px 12px; font-size: 0.71rem; font-family: inherit; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+.qbtn:hover { background: var(--blue); border-color: var(--cyan); color: #fff; }
+.qbtn.meta { border-color: #e65100; color: #ff9800; }
+.qbtn.meta:hover { background: #e65100; color: #fff; }
+.qbtn.web { border-color: #1b5e20; color: #66bb6a; }
+.qbtn.web:hover { background: #1b5e20; color: #fff; }
+
+#messages { flex: 1; overflow-y: auto; padding: 18px 16px; display: flex; flex-direction: column; gap: 16px; }
+#messages::-webkit-scrollbar { width: 3px; }
+#messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+.welcome-card { background: linear-gradient(135deg, #091730, #0d2248); border: 1px solid var(--border); border-radius: 16px; padding: 22px; text-align: center; }
+.welcome-card h2 { font-size: 1rem; color: var(--cyan); margin-bottom: 8px; font-weight: 700; }
+.welcome-card p { font-size: 0.77rem; color: var(--text-dim); line-height: 1.65; max-width: 460px; margin: 0 auto; }
+.caps { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 14px; }
+.cap { border-radius: 12px; padding: 3px 10px; font-size: 0.67rem; font-weight: 600; }
+.cap-blue { background: #0a1e3a; border: 1px solid #1a4070; color: #56b4d3; }
+.cap-orange { background: #1a0f00; border: 1px solid #5a3000; color: #ff9800; }
+.cap-green { background: #001a05; border: 1px solid #1b4a20; color: #66bb6a; }
+
+.msg { display: flex; gap: 10px; max-width: 86%; }
+.msg.user { align-self: flex-end; flex-direction: row-reverse; }
+.msg.assistant { align-self: flex-start; }
+.av { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; align-self: flex-end; }
+.msg.user .av { background: var(--blue); }
+.msg.assistant .av { background: linear-gradient(135deg, #0d3d85, var(--blue-l)); }
+.bubble { padding: 10px 14px; border-radius: 14px; font-size: 0.81rem; line-height: 1.65; }
+.msg.user .bubble { background: linear-gradient(135deg, var(--blue), var(--blue-l)); color: #e8f4fd; border-bottom-right-radius: 4px; }
+.msg.assistant .bubble { background: var(--bg3); border: 1px solid var(--border); color: #c5d8ed; border-bottom-left-radius: 4px; }
+.bubble strong { color: var(--cyan); }
+.bubble em { color: #81c784; font-style: normal; font-weight: 600; }
+.bubble ul { padding-left: 18px; margin: 6px 0; }
+.bubble li { margin-bottom: 3px; }
+.bubble h3 { color: #81c784; font-size: 0.82rem; margin: 8px 0 4px; }
+.bubble h2 { color: var(--cyan); font-size: 0.85rem; margin: 8px 0 4px; }
+.bubble hr { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
+.bubble code { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px; font-size: 0.75rem; color: var(--cyan); }
+.status-msg { font-size: 0.7rem; color: var(--orange); font-style: italic; margin-bottom: 4px; display: flex; align-items: center; gap: 5px; }
+
+.typing .bubble { display: flex; align-items: center; gap: 5px; padding: 13px 16px; }
+.tdot { width: 7px; height: 7px; border-radius: 50%; background: var(--cyan); animation: tb 1.2s ease-in-out infinite; opacity: 0.7; }
+.tdot:nth-child(2) { animation-delay: 0.18s; }
+.tdot:nth-child(3) { animation-delay: 0.36s; }
+@keyframes tb { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-7px);opacity:1} }
+
+.input-zone { padding: 12px 16px; border-top: 1px solid var(--border); background: var(--bg2); flex-shrink: 0; }
+.input-row { display: flex; gap: 8px; align-items: flex-end; }
+textarea { flex: 1; background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; color: var(--text); padding: 10px 14px; font-size: 0.81rem; font-family: inherit; resize: none; outline: none; min-height: 42px; max-height: 120px; line-height: 1.45; transition: border-color 0.2s; }
+textarea:focus { border-color: var(--blue); }
+textarea::placeholder { color: #3a5a7a; }
+#send-btn { width: 42px; height: 42px; background: linear-gradient(135deg, var(--blue), var(--blue-l)); border: none; border-radius: 10px; color: #fff; font-size: 1rem; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.18s; }
+#send-btn:hover:not(:disabled) { transform: translateY(-1px); }
+#send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.hint { font-size: 0.63rem; color: #2e4a6a; text-align: center; margin-top: 6px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🚀</div>
+  <div class="header-info">
+    <h1>Blue Rocket AI Pro</h1>
+    <p>Asistente interno · Digital Performance Agency</p>
+  </div>
+  <div class="badges">
+    <div class="badge badge-green"><div class="dot dot-green"></div>En línea</div>
+    <div class="badge badge-orange"><div class="dot dot-orange"></div>Meta Ads</div>
+  </div>
+</header>
+
+<div class="quick-bar">
+  <div class="quick-label">Consultas rápidas</div>
+  <div class="quick-btns">
+    <button class="qbtn" onclick="q('¿Cómo armo un embudo para un restaurante?')">🍽️ Embudo restaurante</button>
+    <button class="qbtn" onclick="q('¿Qué paquete le recomiendo a un cliente con S/5,000 de inversión?')">💼 Recomendar paquete</button>
+    <button class="qbtn" onclick="q('Dame copy para un anuncio de conversión en Meta Ads para una inmobiliaria')">✍️ Copy Meta Ads</button>
+    <button class="qbtn" onclick="q('¿Qué métricas son más importantes para el público frío?')">📊 Métricas por etapa</button>
+    <button class="qbtn meta" onclick="q('Muéstrame las campañas activas de mis cuentas publicitarias en Meta Ads')">📈 Ver campañas Meta</button>
+    <button class="qbtn meta" onclick="q('¿Cuál es el ROAS de mis campañas de los últimos 7 días en Meta Ads?')">💰 ROAS últimos 7 días</button>
+    <button class="qbtn web" onclick="q('¿Cuáles son las últimas tendencias en Meta Ads para 2025?')">🌐 Tendencias Meta 2025</button>
+    <button class="qbtn web" onclick="q('¿Cuáles son los benchmarks de CTR por industria en Facebook Ads?')">🔍 Benchmarks CTR</button>
+  </div>
+</div>
+
+<div id="messages">
+  <div class="welcome-card">
+    <h2>🚀 Blue Rocket AI Pro</h2>
+    <p>Asistente completo con acceso a tu metodología Blue Rocket, búsqueda web en tiempo real y conexión directa a Meta Ads para analizar tus campañas.</p>
+    <div class="caps">
+      <span class="cap cap-blue">Embudos TOFU · MOFU · BOFU</span>
+      <span class="cap cap-blue">Paquetes Basic · Standard · Prime</span>
+      <span class="cap cap-blue">CPM · CPC · ROAS · CPA</span>
+      <span class="cap cap-orange">📈 Meta Ads en tiempo real</span>
+      <span class="cap cap-orange">📊 Campañas y métricas</span>
+      <span class="cap cap-green">🌐 Búsqueda web</span>
+      <span class="cap cap-green">📰 Tendencias y benchmarks</span>
+    </div>
+  </div>
+</div>
+
+<div class="input-zone">
+  <div class="input-row">
+    <textarea id="inp" placeholder="Pregunta sobre estrategia, campañas Meta, tendencias del mercado..." rows="1"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"
+      oninput="resize(this)"></textarea>
+    <button id="send-btn" onclick="send()">➤</button>
+  </div>
+  <div class="hint">Enter para enviar · Shift+Enter para nueva línea</div>
+</div>
+
+<script>
+const ANTHROPIC_KEY = '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';
+const META_TOKEN = 'EAAVWoCXqPKYBR6qa4trEd6zvJmUGcZAaOBDl1jC9kPVn7xeN8UEis78m7qQvy57kz07Vg3UvO2jIbdqP5RqrZAxDRglsShWpMsx5MoajhIxYy7y4R4jTBfpdLcqwmDZBz1CAvX7qOr524Q5agkvw16hQFbqjfK5WlU67vzcfhn00ZA5CMGg96lLN8QXZBZBnIQInK2aGQZCGm3ZCcVkDnjUxm3eW7NItmAwNPmTD9cCOmZBK93kbmS0rKWKLEP17sGVAOZAWKcFYLaEZACE0QXEDHPLZAQZDZD';
+
+const SYSTEM = `Eres el asistente interno de estrategia de Blue Rocket Digital, una agencia de performance digital con sede en Lima, Perú y Miami, USA. También eres experto en la Metodología 3 Q's de Felipe Vergara para análisis de campañas Meta Ads.
+
+=== BLUE ROCKET DIGITAL ===
+
+SOBRE LA AGENCIA:
+- Agencia de marketing digital centrada en resultados, más de 100 clientes atendidos
+- Especialistas en conversiones (leads calificados y ventas) y optimización de ROI
+- Agencia Partner oficial de Meta (Facebook/Instagram)
+- Industrias: restaurantes, inmobiliarias, salud, retail, servicios, deportes y más
+
+METODOLOGÍA BLUE ROCKET - EMBUDO DE 3 ETAPAS:
+
+ETAPA 1 - RECONOCIMIENTO (Público Frío / TOFU):
+- Objetivo: Primer punto de contacto con la marca, llegar a usuarios calificados
+- Contenido: Educacional, informativo, inspirador, storytelling, awareness
+- Métricas clave: CPM, CPC, Costo por seguidor
+
+ETAPA 2 - CONSIDERACIÓN (Público Tibio / MOFU):
+- Objetivo: Segundo contacto, transmitir confianza y conocimiento
+- Contenido: Storytelling, testimoniales, beneficios, tips, UGC, educacional
+- Segmentación: Usuarios que vieron mínimo 50% del primer video
+- Métricas clave: Costo por resultado (mensajes, interacciones, reproducciones)
+
+ETAPA 3 - CONVERSIÓN (Público Caliente / BOFU):
+- Objetivo: Vender a quienes mostraron interés
+- Contenido: Oferta, descuento, tiempo limitado, CTA fuerte
+- Audiencias: Visitantes web, seguidores, mensajes últimos 30 días, carritos abandonados
+- Métricas clave: CPA, ROAS, ventas
+
+PAQUETES:
+- BASIC: Hasta 3 campañas o S/5,000 inversión, una plataforma. Fee: $300 + IGV
+- STANDARD: Hasta 5 campañas o S/10,000 inversión, dos plataformas. Fee: $400 + IGV
+- PRIME: Hasta S/15,000 inversión, todas las plataformas. Fee: $500 + IGV
+Fee mensual sin contrato. Plataformas: Meta Ads, Google Ads, TikTok Ads, LinkedIn Ads.
+
+CASOS DE ÉXITO:
+- La Nevera Fit: +30% ventas delivery, mejor tasa de conversión
+- Terminal Pesquero: 50% más alcance con la misma inversión
+- LimaLinen: ROAS 10+, crecimiento exponencial de ventas online
+
+CLIENTES: Cornerstone, Terminal Pesquero, La Nevera Fit, LimaLinen, Camikids, Cambia FX, Naturo, In Urban, Cuidamed, City Tactic, Shadow, Oszada, Manu Café, entre otros.
+
+=== METODOLOGÍA 3 Q'S DE FELIPE VERGARA ===
+
+Cuando el usuario pida analizar campañas de Meta Ads, aplica esta metodología:
+
+TIPOS DE CAMPAÑA:
+- VENTAS: hay datos de Compras, ROAS o Pagos iniciados
+- INTERACCIÓN/MENSAJES: hay datos de Conversaciones iniciadas
+- CP FORMULARIOS: hay Leads sin Visitas a landing significativas
+- CP SITIO WEB: hay Leads con Visitas a landing
+- RECONOCIMIENTO: solo alcance, impresiones, video, sin compras/leads/conversaciones
+
+LAS 3 Q's:
+1. Qué pasó? Resultados principales vs objetivo del usuario
+2. Por qué pasó? Diagnóstico del embudo con benchmarks semáforo
+3. Qué haremos? Acciones concretas según problemas detectados
+
+OBJETIVO DEL NEGOCIO (siempre preguntar antes de analizar):
+- Ventas: cuál es tu ROAS objetivo?
+- Leads: cuál es tu CPL objetivo?
+- Mensajes: cuál es tu Costo por Conversación objetivo?
+
+SEMÁFORO: ROAS >= objetivo VERDE / >= 80% AMARILLO / < 80% ROJO. CPL <= objetivo VERDE / <= 120% AMARILLO / > 120% ROJO.
+
+BENCHMARKS (usar SOLO estos):
+- CTR saliente: ROJO menor 1% / AMARILLO 1-2% / VERDE mayor 2%
+- % Visitas/Clics salientes: ROJO menor 50% / AMARILLO 50-70% / VERDE mayor 70%
+- % Ver contenido/Visitas: ROJO menor 60% / AMARILLO 60-100% / VERDE mayor 100%
+- % Carritos/Ver contenido: ROJO menor 10% / AMARILLO 10-20% / VERDE mayor 20%
+- % Checkout/Carritos: ROJO menor 30% / AMARILLO 30-50% / VERDE mayor 50%
+- % Compras/Pagos iniciados: ROJO menor 10% / AMARILLO 10-30% / VERDE mayor 30%
+- Tasa conversión leads/visitas: ROJO menor 10% / AMARILLO 10-20% / VERDE mayor 20%
+- % Reproducciones 3s/Impresiones: ROJO menor 20% / AMARILLO 20-30% / VERDE mayor 30%
+- Tiempo promedio reproducción: ROJO menor 3s / AMARILLO 3-6s / VERDE mayor 6s
+- Frecuencia: menos de 3 ideal, más de 5 saturado
+
+EFECTO DESGLOSE (aplicar siempre antes de recomendar pausar):
+- Con CBO: evalúa SOLO a nivel campaña, nunca por adset
+- Nunca pausar durante fase de aprendizaje
+- Nunca pausar si es el único anuncio activo en el adset
+- Un cambio a la vez para no resetear el aprendizaje
+
+DIAGNÓSTICO POR PROBLEMA:
+- ROAS bajo: revisar margen/precio, auditar embudo completo
+- CTR bajo menor 1%: mejorar creativo copy, imagen/video, propuesta de valor
+- % Visitas/Clics bajo menor 70%: mejorar velocidad y UX de landing page
+- Tasa conversión baja: optimizar landing formulario más simple, mejor oferta, CTA claro
+- % Video 3s bajo menor 30%: mejorar gancho de los primeros 3 segundos
+- Frecuencia alta mayor 5: rotar creativos, ampliar audiencia
+- CPM alto: usar públicos más grandes, mejorar calidad del anuncio
+
+TU ROL:
+- Eres consultor experto en metodología Blue Rocket Y en la metodología 3 Q's de Felipe Vergara
+- Ayudas al equipo a diseñar estrategias, analizar campañas, crear copies y resolver dudas
+- Siempre pregunta el objetivo del negocio antes de diagnosticar campañas
+- Al recomendar pausar algo, aplica primero las reglas del Efecto Desglose
+- Usa lenguaje profesional pero cercano, en español
+- Sé concreto y accionable, da ejemplos específicos
+- Adapta la metodología a la industria del cliente`;
+
+let history = [];
+let busy = false;
+
+async function fetchMetaAdAccounts() {
+  const res = await fetch(`https://graph.facebook.com/v19.0/me/adaccounts?fields=name,account_id,currency,account_status&access_token=${META_TOKEN}`);
+  return await res.json();
+}
+
+async function fetchMetaCampaigns(accountId, dateRange = 'last_7d') {
+  const res = await fetch(`https://graph.facebook.com/v19.0/${accountId}/campaigns?fields=name,status,objective,insights.date_preset(${dateRange}){spend,impressions,clicks,ctr,cpm,cpc,actions,action_values,roas}&access_token=${META_TOKEN}`);
+  return await res.json();
+}
+
+function detectMetaIntent(text) {
+  const keywords = ['campaña', 'campañas', 'meta ads', 'facebook ads', 'roas', 'cpa', 'cpm', 'cpc', 'inversión', 'gasto', 'resultados', 'métricas', 'cuenta publicitaria', 'ads manager', 'rendimiento', 'performance'];
+  return keywords.some(k => text.toLowerCase().includes(k));
+}
+
+function detectWebIntent(text) {
+  const keywords = ['tendencia', 'benchmark', 'noticia', 'actualidad', '2025', '2026', 'último', 'reciente', 'nueva', 'qué hay', 'cómo está', 'mercado'];
+  return keywords.some(k => text.toLowerCase().includes(k));
+}
+
+function resize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function q(text) { document.getElementById('inp').value = text; send(); }
+
+async function send() {
+  const inp = document.getElementById('inp');
+  const text = inp.value.trim();
+  if (!text || busy) return;
+  inp.value = ''; inp.style.height = 'auto';
+  addMsg('user', text);
+  history.push({ role: 'user', content: text });
+  setBusy(true); showTyping();
+
+  let metaContext = '';
+  let webContext = '';
+
+  // Fetch Meta Ads data if relevant
+  if (detectMetaIntent(text)) {
+    updateTypingStatus('🔍 Consultando Meta Ads...');
+    try {
+      const accounts = await fetchMetaAdAccounts();
+      if (accounts.data && accounts.data.length > 0) {
+        let metaData = '=== DATOS DE META ADS ===\n';
+        for (const account of accounts.data.slice(0, 3)) {
+          metaData += `\nCuenta: ${account.name} (${account.account_id})\n`;
+          const campaigns = await fetchMetaCampaigns('act_' + account.account_id);
+          if (campaigns.data) {
+            campaigns.data.slice(0, 5).forEach(c => {
+              metaData += `  Campaña: ${c.name} | Estado: ${c.status}\n`;
+              if (c.insights && c.insights.data && c.insights.data[0]) {
+                const ins = c.insights.data[0];
+                metaData += `    Gasto: $${parseFloat(ins.spend||0).toFixed(2)} | Impresiones: ${ins.impressions||0} | Clics: ${ins.clicks||0} | CTR: ${parseFloat(ins.ctr||0).toFixed(2)}% | CPM: $${parseFloat(ins.cpm||0).toFixed(2)} | CPC: $${parseFloat(ins.cpc||0).toFixed(2)}\n`;
+              }
+            });
+          }
+        }
+        metaContext = metaData;
+      }
+    } catch(e) {
+      metaContext = 'No se pudo acceder a Meta Ads en este momento.';
+    }
+  }
+
+  // Build messages with context
+  const messagesWithContext = [...history];
+  if (metaContext || webContext) {
+    const lastMsg = messagesWithContext[messagesWithContext.length - 1];
+    let contextStr = '\n\nCONTEXTO ADICIONAL:\n';
+    if (metaContext) contextStr += metaContext;
+    if (webContext) contextStr += '\n' + webContext;
+    messagesWithContext[messagesWithContext.length - 1] = {
+      ...lastMsg,
+      content: lastMsg.content + contextStr
+    };
+  }
+
+  updateTypingStatus('💭 Analizando...');
+
+  try {
+    const tools = detectWebIntent(text) ? [{
+      type: 'web_search_20250305',
+      name: 'web_search'
+    }] : [];
+
+    const body = {
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1500,
+      system: SYSTEM,
+      messages: messagesWithContext
+    };
+    if (tools.length > 0) body.tools = tools;
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': ANTHROPIC_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify(body)
+    });
+
+    const data = await res.json();
+    removeTyping();
+
+    const textBlock = data.content && data.content.find(b => b.type === 'text');
+    if (textBlock) {
+      history.push({ role: 'assistant', content: textBlock.text });
+      addMsg('assistant', textBlock.text);
+    } else {
+      addMsg('assistant', '⚠️ No se obtuvo respuesta. Intenta de nuevo.');
+    }
+  } catch(e) {
+    removeTyping();
+    addMsg('assistant', '⚠️ Error de conexión. Intenta de nuevo.');
+  }
+
+  setBusy(false);
+}
+
+function setBusy(v) { busy = v; document.getElementById('send-btn').disabled = v; }
+
+function updateTypingStatus(msg) {
+  const el = document.getElementById('typing-status');
+  if (el) el.textContent = msg;
+}
+
+function showTyping() {
+  const c = document.getElementById('messages');
+  const d = document.createElement('div');
+  d.className = 'msg assistant typing'; d.id = 'typing';
+  d.innerHTML = `<div class="av">🚀</div><div class="bubble"><div style="display:flex;flex-direction:column;gap:6px"><div class="status-msg"><span id="typing-status">💭 Pensando...</span></div><div style="display:flex;gap:5px"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div></div></div>`;
+  c.appendChild(d); c.scrollTop = c.scrollHeight;
+}
+
+function removeTyping() { const el = document.getElementById('typing'); if (el) el.remove(); }
+
+function addMsg(role, text) {
+  const c = document.getElementById('messages');
+  const d = document.createElement('div');
+  d.className = `msg ${role}`;
+  d.innerHTML = `<div class="av">${role==='user'?'👤':'🚀'}</div><div class="bubble">${fmt(text)}</div>`;
+  c.appendChild(d); c.scrollTop = c.scrollHeight;
+}
+
+function fmt(t) {
+  return t
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/`(.+?)`/g,'<code>$1</code>')
+    .replace(/^### (.+)$/gm,'<h3>$1</h3>')
+    .replace(/^## (.+)$/gm,'<h2>$1</h2>')
+    .replace(/^- (.+)$/gm,'<li>$1</li>')
+    .replace(/(<li>.*<\/li>\n?)+/g, m=>`<ul>${m}</ul>`)
+    .replace(/^(\d+)\. (.+)$/gm,'<li><strong>$1.</strong> $2</li>')
+    .replace(/---/g,'<hr>')
+    .replace(/\n\n/g,'<br><br>')
+    .replace(/\n/g,'<br>');
+}
+</script>
+</body>
+</html>
